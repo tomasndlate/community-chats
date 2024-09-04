@@ -31,7 +31,7 @@ export class InputPrimaryComponent {
   /** Predefined input value
    * @type { string }
    */
-  @Input() inputValue = "";
+  @Input() inputValue: string = "";
 
   @Output() inputValueChange = new EventEmitter<string>();
   @Output() inputDisabledChange = new EventEmitter<string>();

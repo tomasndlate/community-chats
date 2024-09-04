@@ -12,8 +12,8 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 
 passport.use(new GoogleStrategy({
     // code executed in /auth/google
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_KEY,
+    clientID: process.env.API_GOOGLE_CLIENT_ID,
+    clientSecret: process.env.API_GOOGLE_CLIENT_KEY,
     callbackURL: 'http://localhost:3000/auth/google/callback'
   },
   // code executed in /auth/google/callback
@@ -45,21 +45,21 @@ passport.use(new GoogleStrategy({
         error = !error.statusCode ? new ServerError('Internal error.') : error;
         done(error, false);
     }
-    
+
 }));
 
 passport.use(new JwtStrategy({
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.JWT_SECRET
+    secretOrKey: process.env.API_JWT_SECRET
     }, async (jwt_payload, done) => {
     try {
         const user = await User.findById(jwt_payload.userId);
-        
+
         if (!user)
             throw new NotFoundError('User not found');
-        
+
         done(null, user);
-        
+
     } catch (error) {
         error = !error.statusCode ? new ServerError('Internal error.') : error;
         done(error, false);

@@ -9,6 +9,7 @@ import { AppUiComponentsModule } from './components/app-ui-components/app-ui-com
 import { NavMenuComponent } from './components/nav-menu/nav-menu.component';
 import { NavProfileMenuComponent } from './components/nav-profile-menu/nav-profile-menu.component';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { FormsModule } from '@angular/forms';
     BrowserModule,
     RouterModule.forRoot(AppRoutes),
     AppUiComponentsModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

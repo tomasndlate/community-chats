@@ -7,15 +7,37 @@
       <button>Google</button>
     </div>
     <div class="sign-up_body_credentials-method">
-      <form action="">
-        <app-input-primary
+      <!-- <form> -->
+        <input [(ngModel)]="nameField.value" type="text" placeholder="name">
+        <br>
+        <input [(ngModel)]="usernameField.value" type="text" placeholder="username">
+        <br>
+        <input [(ngModel)]="emailField.value" type="text" placeholder="email">
+        <br>
+        <input [(ngModel)]="passwordField.value" type="text" placeholder="password">
+        <br>
+
+        <p>Name: {{ nameField.value }}</p>
+        <p>Username: {{ usernameField.value }}</p>
+        <p>Email: {{ emailField.value }}</p>
+        <p>Password: {{ passwordField.value }}</p>
+
+
+        <button (click)="signup()">Sign up</button>
+        <!-- {
+        "email": "user@gmail.com",
+        "username": "user123",
+        "password": "example123",
+        "name": "User Three"
+        } -->
+        <!-- <app-input-primary
           [label]="usernameField.label"
           [status]="usernameField.status"
           [inputType]="usernameField.type"
           [isInputDisabled]="usernameField.isLocked"
           (inputValueChange)="updateUsernameFieldValue(usernameField, $event)"
           (inputDisabledChange)="test()"
-          ></app-input-primary>
+          ></app-input-primary> -->
 
           <!-- <app-input-primary
           (inputValueChange)="test()"
@@ -34,7 +56,7 @@
           [label]="'Username 3'"
           [isInputDisabled]="true"
           ></app-input-primary> -->
-      </form>
+      <!-- </form> -->
 
 
     </div>

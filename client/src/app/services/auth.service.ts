@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, map, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, filter, map, Observable, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { AuthTokenResponse } from '../models/auth-token.model';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { AuthToken } from '../models/auth-token.model';
+import { ApiErrorResponse, ApiSuccessResponse } from '../models/responses.model';
+import { NavigationEnd, Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -11,12 +13,15 @@ export class AuthService {
 
   private apiUrl = environment.apiUrl;
   private isUserLoggedInSubject = new BehaviorSubject<boolean>(false);
-  isUserLoggedIn: Observable<boolean> = this.isUserLoggedInSubject.asObservable();
+  isUserLoggedIn$: Observable<boolean> = this.isUserLoggedInSubject.asObservable();
+  private urls = {
+    current: '',
+    previous: ''
+  }
 
-  constructor(private http: HttpClient) {
-    // First time called set the user status at the moment
-    // this.token = localStorage.getItem('authToken');
-    // this.updateLoggedStatus()
+  constructor(private http: HttpClient, private router: Router) {
+    // Need to be initialize in the app component to track since the beginning
+    this.trackUrl();
   }
 
   signUp(email: string, username: string, password: string, name: string): Observable<boolean> {
@@ -32,44 +37,59 @@ export class AuthService {
         // 'Authorization': `Bearer ${token}`
       }),
     };
-    return this.http.post<AuthTokenResponse>(`${this.apiUrl}/signup`, requestBody, httpOptions).pipe(
+    return this.http.post<ApiSuccessResponse<AuthToken>>(`${this.apiUrl}/auth/signup`, requestBody, httpOptions).pipe(
       map((response) => {
-        const accessToken = response.data.accessToken;
-        if (!!accessToken) {
-          this.setToken(accessToken);
+        if (!!response.data.accessToken) {
+          this.setToken(response.data.accessToken);
           this.setIsUserLoggedIn(true);
+          return true;
         }
-        return !!accessToken;
+        return false;
       }),
-      catchError((error) => {
-        return throwError(() => error);
+      catchError((error: HttpErrorResponse) => {
+        return throwError(() => error.error);
       })
     )
   }
 
   signOut() {
-    this.removeToken()
-    this.setUserLoggedStatus(false);
+    this.removeToken();
+    this.setIsUserLoggedIn(false);
     // this.router.navigate(['/signin'])
   }
 
-  getToken() {
+  private getToken() {
     return localStorage.getItem('accessToken');
   }
 
-  private setToken(token: string | null){
-    if (!!token) {
-      localStorage.setItem('accessToken', token);
-    } else {
-      localStorage.removeItem('accessToken');
-    }
+  private setToken(token: string) {
+    localStorage.setItem('accessToken', token);
   }
 
   private removeToken(){
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('accessToken');
   }
 
   private setIsUserLoggedIn(newStatus: boolean): void {
     this.isUserLoggedInSubject.next(newStatus);
+  }
+
+  private trackUrl(): void {
+    this.urls.current = this.router.url;
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe(
+      (event: NavigationEnd) => {
+        // console.log(`NAVIGATED TO ${event.url}`)
+        if ( !['/auth/signin', '/auth/signup'].includes(event.url) ) {
+          this.urls.previous = this.urls.current;
+          this.urls.current = event.url;
+          // console.log(`URLS previous ${this.urls.previous} | current ${this.urls.current}`)
+        }
+    })
+  }
+
+  getPreviousUrl(): string {
+    return this.urls.previous;
   }
 }

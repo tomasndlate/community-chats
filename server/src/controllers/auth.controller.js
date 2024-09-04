@@ -23,28 +23,28 @@ const signup = async (req, res) => {
         if(!email)
             detailsError.push({
                 field: 'email',
-                errorCode: 'INVALID_EMAIL_ERROR', 
+                errorCode: 'INVALID_EMAIL_ERROR',
                 message: 'Email not valid'
             })
         if(!username)
             detailsError.push({
                 field: 'username',
-                errorCode: 'INVALID_USERNAME_ERROR', 
+                errorCode: 'INVALID_USERNAME_ERROR',
                 message: 'Username not valid'
             })
         if(!password)
             detailsError.push({
                 field: 'password',
-                errorCode: 'INVALID_PASSWORD_ERROR', 
+                errorCode: 'INVALID_PASSWORD_ERROR',
                 message: 'Password not valid'
             })
         if(!name)
             detailsError.push({
                 field: 'name',
-                errorCode: 'INVALID_NAME_ERROR', 
+                errorCode: 'INVALID_NAME_ERROR',
                 message: 'Name not valid'
             })
-        
+
         if (!!detailsError.length)
             throw new BadRequestError({
                 details: detailsError
@@ -56,15 +56,15 @@ const signup = async (req, res) => {
         const response = new CreatedResponse({
             message: 'User created',
             data: {
-                User: {
-                    _id: user._id,
-                    email: user.email,
-                    username: user.username,
-                    name: user.name
-                },
-                AuthToken: {
+                // User: {
+                //     _id: user._id,
+                //     email: user.email,
+                //     username: user.username,
+                //     name: user.name
+                // },
+                // AuthToken: {
                     accessToken: accessToken
-                }
+                // }
             }
         })
 
@@ -86,13 +86,13 @@ const login = async (req, res) => {
         if(!email)
             detailsError.push({
                 field: 'email',
-                errorCode: 'INVALID_EMAIL_ERROR', 
+                errorCode: 'INVALID_EMAIL_ERROR',
                 message: 'Email not valid'
             })
         if(!password)
             detailsError.push({
                 field: 'password',
-                errorCode: 'INVALID_PASSWORD_ERROR', 
+                errorCode: 'INVALID_PASSWORD_ERROR',
                 message: 'Password not valid'
             })
 
@@ -100,17 +100,17 @@ const login = async (req, res) => {
             throw new BadRequestError({
                 details: detailsError
             })
-    
+
         const user = await User.findOne({ email });
-    
+
         if(!user)
             throw new NotFoundError({message: 'Email not found'});
-        
+
         if(!user.password)
             throw new UnauthorizedError({message: 'Other type of authentication required'});
-    
+
         const isValidPassword = await comparePassword(password, user.password);
-        
+
         if(!isValidPassword)
             throw new UnauthorizedError({message: 'Invalid password'});
 
@@ -130,7 +130,7 @@ const login = async (req, res) => {
                 }
             }
         });
-        
+
         res.status(response.code).json(response.getResponse());
     } catch (error) {
         error = !error.status ? new InternalServerError() : error;

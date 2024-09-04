@@ -3,9 +3,9 @@ const {logger} = require('../configs/winstonConfig');
 
 exports.connect = async () => {
     try {
-        await mongoose.connect(process.env.DB_URL, { 
-            useNewUrlParser: true, 
-            useUnifiedTopology: true 
+        await mongoose.connect(process.env.API_DB_URL, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
         });
         logger.info('Connected to MongoDB');
 
