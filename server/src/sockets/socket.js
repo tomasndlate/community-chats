@@ -1,6 +1,6 @@
 const socketIO = require('socket.io');
-const {threadSocket} = require('./routes/websocket/thread.socket');
-const { messageSocket } = require('./routes/websocket/message.socket');
+const {threadSocket} = require('./events/thread.event');
+const { messageSocket } = require('./events/message.event');
 
 module.exports = (server) => {
     const io = socketIO(server, {

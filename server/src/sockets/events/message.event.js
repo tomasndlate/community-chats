@@ -1,5 +1,5 @@
-const { sendMessage } = require("../../controllers/websocket/messageController");
-const { socketAuth } = require("../../middleware/socketAuth");
+const { sendMessage } = require("../../web/controllers/websocket/messageController");
+const { socketAuth } = require("../../web/middleware/socketAuth");
 
 exports.messageSocket = (io, socket) => {
 

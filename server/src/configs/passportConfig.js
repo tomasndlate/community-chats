@@ -1,11 +1,11 @@
 const passport = require('passport');
-const LocalStrategy = require('passport-local');
+// const LocalStrategy = require('passport-local');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
-const User = require('../models/User');
-const { comparePassword } = require('../utils/passwordUtils');
-const AuthenticationError = require('../errors/Unauthorized.error');
+const User = require('../core/models/User');
+// const { comparePassword } = require('../core/utils/passwordUtils');
+// const AuthenticationError = require('../errors/Unauthorized.error');
 const ServerError = require('../errors/InternalServer.error');
-const AuthorizationError = require('../errors/AuthorizationError');
+// const AuthorizationError = require('../errors/AuthorizationError');
 const NotFoundError = require('../errors/NotFound.error');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
