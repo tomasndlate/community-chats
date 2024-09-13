@@ -1,5 +1,5 @@
 const { sendErrorResponse } = require('../../core/utils/responseUtils');
-const passport = require('../../configs/passportConfig');
+const passport = require('../../configs/passport.config').default;
 
 const googleMiddleware = (req, res, next) => {
     passport.authenticate('google', { session: false }, (error, user, info) => {

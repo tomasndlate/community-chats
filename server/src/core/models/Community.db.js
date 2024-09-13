@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const BadRequestError = require('../errors/BadRequest.error');
-const User = require('./User');
+const User = require('./User.db');
 const DatabaseError = require('../errors/DatabaseError');
 
 const communitySchema = new mongoose.Schema({
@@ -39,7 +39,7 @@ communitySchema.pre("save", async function (next) {
     try {
         if(this.members.length === 0)
             next();
-        
+
         const isMembersValid = await User.countDocuments({ _id: { $in: this.members } }) === this.members.length ? true : false;
         if (!isMembersValid)
             throw new BadRequestError('Not all members are valid');

@@ -1,13 +1,19 @@
+// @ts-ignore
 const passport = require('passport');
 // const LocalStrategy = require('passport-local');
+// @ts-ignore
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const User = require('../core/models/User');
 // const { comparePassword } = require('../core/utils/passwordUtils');
 // const AuthenticationError = require('../errors/Unauthorized.error');
+// @ts-ignore
 const ServerError = require('../errors/InternalServer.error');
 // const AuthorizationError = require('../errors/AuthorizationError');
+// @ts-ignore
 const NotFoundError = require('../errors/NotFound.error');
+// @ts-ignore
 const JwtStrategy = require('passport-jwt').Strategy;
+// @ts-ignore
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
 passport.use(new GoogleStrategy({
@@ -17,6 +23,7 @@ passport.use(new GoogleStrategy({
     callbackURL: 'http://localhost:3000/auth/google/callback'
   },
   // code executed in /auth/google/callback
+  // @ts-ignore
   async (accessToken, refreshToken, profile, done) => {
     try {
         // Check if the user is already authenticated via Google OAuth2
@@ -42,6 +49,7 @@ passport.use(new GoogleStrategy({
         return done(null, newUser);
 
     } catch (error) {
+        // @ts-ignore
         error = !error.statusCode ? new ServerError('Internal error.') : error;
         done(error, false);
     }
@@ -51,6 +59,7 @@ passport.use(new GoogleStrategy({
 passport.use(new JwtStrategy({
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.API_JWT_SECRET
+    // @ts-ignore
     }, async (jwt_payload, done) => {
     try {
         const user = await User.findById(jwt_payload.userId);
@@ -61,6 +70,7 @@ passport.use(new JwtStrategy({
         done(null, user);
 
     } catch (error) {
+        // @ts-ignore
         error = !error.statusCode ? new ServerError('Internal error.') : error;
         done(error, false);
     }

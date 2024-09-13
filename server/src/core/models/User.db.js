@@ -6,22 +6,18 @@ const userSchema = new mongoose.Schema({
     unique: true,
     sparse: true
   },
-  email: {
+  name: {
     type: String,
-    unique: true
   },
-  username: {
+  email: {
     type: String,
     unique: true
   },
   password: {
     type: String,
   },
-  name: {
-    type: String,
-  }
 });
 
-const User = mongoose.model('User', userSchema);
+export const User = mongoose.model('User', userSchema);
 
-module.exports = User;
+// module.exports = User;

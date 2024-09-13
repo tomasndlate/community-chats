@@ -1,8 +1,8 @@
-const Thread = require("../models/Thread");
+const Thread = require("../models/Thread.db");
 
 // TODO: Implement when creating threads
 exports.generateUniqueNameId = async (communityId, name, suffix = '', count = 0) => {
-    
+
     let nameId = name.toLowerCase().replace(/\s+/g, '-');
 
     if (suffix)
@@ -14,6 +14,6 @@ exports.generateUniqueNameId = async (communityId, name, suffix = '', count = 0)
         count++;
         return generateUniqueNameId(name, count, count);
     }
-    
+
     return nameId;
 }

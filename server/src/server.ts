@@ -1,11 +1,18 @@
-const express = require('express');
-const http = require('http');
-const cors = require('cors');
-require('dotenv').config();
-const mongodbConfig = require('./configs/mongodbConfig');
+// const express = require('express');
+import express from "express";
+// const http = require('http');
+import http from "http";
+// const cors = require('cors');
+import cors from "cors";
+
+// require('dotenv').config();
+import dotenv from "dotenv";
+dotenv.config()
+
+import { connectMongoDB } from './configs/mongodb.config';
 // const passportConfig = require('./configs/passportConfig');
-const { logger, expressLogger } = require('./configs/winstonConfig');
-const { initOpenAPI } = require('./configs/openapi.config');
+import { logger, expressLogger } from './configs/winston.config';
+// const { initOpenAPI } = require('./configs/openapi.config');
 
 // Instance of express application
 const expressApp = express();
@@ -14,7 +21,7 @@ const expressApp = express();
 expressApp.use(cors());
 expressApp.use(express.json());
 expressApp.use(expressLogger);
-mongodbConfig.connect();
+connectMongoDB();
 // passportConfig.initialize();
 
 // Importing REST Routes and documentation
@@ -29,7 +36,7 @@ const restServer = http.createServer(expressApp);
 const port = process.env.API_PORT;
 restServer.listen(port, () => {
     // Open API Definition
-    initOpenAPI(expressApp, process.env.API_PORT);
+    // initOpenAPI(expressApp, process.env.API_PORT);
     // Start the server
     // socket(restServer);
 

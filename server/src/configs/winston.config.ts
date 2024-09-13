@@ -1,8 +1,10 @@
-const winston = require('winston');
-const expressWinston = require('express-winston');
+import winston from 'winston';
+import expressWinston from 'express-winston';
+import { Request, Response } from 'express';
+
 
 // Configure Winston logger
-const logger = winston.createLogger({
+export const logger: any = winston.createLogger({
   level: 'info',
   format: winston.format.simple(),
   transports: [
@@ -11,12 +13,12 @@ const logger = winston.createLogger({
 });
 
 // Define the custom ignore route function
-const ignoreSwaggerDocsRoute = (req, res) => {
+const ignoreSwaggerDocsRoute = (req: Request, res: Response) => {
     return req.path.startsWith('/docs');
 };
 
 // Configure Express Winston middleware
-const expressLogger = expressWinston.logger({
+export const expressLogger = expressWinston.logger({
   transports: [
       new winston.transports.Console()
   ],
@@ -27,14 +29,9 @@ const expressLogger = expressWinston.logger({
   ),
   ignoreRoute: ignoreSwaggerDocsRoute,
   // Include all metadata
-  meta: true, 
+  meta: true,
   expressFormat: true,
   colorize: true,
-  // Add the json response to the log   
+  // Add the json response to the log
   responseWhitelist: [...expressWinston.responseWhitelist, 'body']
 });
-
-module.exports = {
-  logger,
-  expressLogger
-};

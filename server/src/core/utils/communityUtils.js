@@ -1,8 +1,8 @@
-const Community = require("../models/Community");
+const Community = require("../models/Community.db");
 
 // TODO: Implement when creating communities
 exports.generateUniqueNameId = async (name, suffix = '', count = 0) => {
-    
+
     let nameId = name.toLowerCase().replace(/\s+/g, '-');
 
     if (suffix)
@@ -14,6 +14,6 @@ exports.generateUniqueNameId = async (name, suffix = '', count = 0) => {
         count++;
         return generateUniqueNameId(name, count, count);
     }
-    
+
     return nameId;
 }

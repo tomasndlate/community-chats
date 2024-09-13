@@ -1,4 +1,4 @@
-const RequestErrors = {
+export const ErrorConstants = {
   INVALID: {
     NAME: { code: "INVALID_NAME", message: "Name is invalid" },
     EMAIL: { code: "INVALID_EMAIL", message: "Email is invalid" },
@@ -14,8 +14,7 @@ const RequestErrors = {
   NOT_FOUND: {
     EMAIL: { code: "NOT_FOUND_EMAIL", message: "Email not found" },
   }
-};
+} as const;
 
-module.exports = {
-  RequestErrors
-};
+export type ErrorConstantsType = { code: string, message: string };
+

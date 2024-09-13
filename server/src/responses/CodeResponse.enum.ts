@@ -1,4 +1,4 @@
-const CodeResponse = {
+export const CodeResponse = {
   OK: {
     code: 200,
     message: 'Success'
@@ -31,8 +31,6 @@ const CodeResponse = {
     code: 500,
     message: 'Internal Server Error'
   }
-};
+} as const;
 
-module.exports = {
-  CodeResponse
-};
+export type CodeResponseType = typeof CodeResponse[keyof typeof CodeResponse];

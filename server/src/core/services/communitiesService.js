@@ -1,24 +1,24 @@
-const User = require('../models/User');
-const Community = require('../models/Community');
+const User = require('../models/User.db');
+const Community = require('../models/Community.db');
 const DatabaseError = require('../errors/DatabaseError');
 const BadRequestError = require('../errors/BadRequest.error');
 const NotFoundError = require('../errors/NotFound.error');
 const AuthorizationError = require('../errors/AuthorizationError');
 const mongoose = require('mongoose');
-const Thread = require('../models/Thread');
+const Thread = require('../models/Thread.db');
 
 
 exports.create = async (owner, name, description, members) => {
     try {
-        
+
         const newCommunity = new Community({
-            owner: owner, 
-            name: name, 
-            description: description, 
+            owner: owner,
+            name: name,
+            description: description,
             members: members
         });
         await newCommunity.save();
-        
+
         const defaultThread = new Thread({
             community: newCommunity._id,
             nameId: "general",
@@ -28,7 +28,7 @@ exports.create = async (owner, name, description, members) => {
 
         newCommunity.threads.push(defaultThread.nameId);
         await newCommunity.save();
-        
+
         return newCommunity;
 
     } catch (error) {
@@ -44,11 +44,11 @@ exports.create = async (owner, name, description, members) => {
 
 exports.find = async (name, page, limit) => {
     try {
-        
-        const filterByName = name != '*' 
-                ? { name: { $regex: new RegExp(name, 'i') } } 
+
+        const filterByName = name != '*'
+                ? { name: { $regex: new RegExp(name, 'i') } }
                 : {};
-        
+
         const communities = await Community.find(filterByName).skip((page - 1) * limit).limit(limit);
 
         return communities;
@@ -77,7 +77,7 @@ exports.getByName = async (name) => {
 exports.addMembers = async (userId, communityName, membersUsername) => {
     try {
         const membersIds = await mapUsernamesToIds(membersUsername);
-        
+
         if (!membersIds)
             throw new BadRequestError('Bad Request: Not all usernames are correct')
 
@@ -85,20 +85,20 @@ exports.addMembers = async (userId, communityName, membersUsername) => {
 
         if (!community)
             throw new BadRequestError('Bad Request: Community not found');
-        
+
         if (community.owner.toString() != userId.toString())
             throw new AuthorizationError('Unathorized: User is not the community owner');
-     
+
         const updatedResult = await Community.updateOne(
             { _id: community._id },
             { $addToSet: { members: { $each: membersIds } } }
         );
-        
+
         if (updatedResult.ok === 0)
             throw new DatabaseError('Database error.');
 
         return await Community.findOne({name: communityName});
-        
+
     } catch (error) {
         error = !error.statusCode ? new DatabaseError('Database error.') : error;
         throw error;
@@ -111,7 +111,7 @@ exports.addMember = async (userId, communityName) => {
 
         if (!community)
             throw new BadRequestError('Bad Request: Community not found');
-        
+
         const updatedResult = await Community.updateOne(
             { _id: community._id },
             { $addToSet: { members: userId } }
@@ -126,7 +126,7 @@ exports.addMember = async (userId, communityName) => {
         error = !error.statusCode ? new DatabaseError('Database error.') : error;
         throw error;
     }
-    
+
 }
 
 exports.getMembers = async (communityName) => {
@@ -146,17 +146,17 @@ exports.getMembers = async (communityName) => {
 
 exports.getThreads = async (communityName, name, page, limit) => {
     try {
-        
+
         const communityId = await Community.findOne({ name: communityName }).select({ _id: 1});
-        
+
         if (!communityId)
             throw new NotFoundError('Community Not Found');
 
         let query = { community: communityId };
-        
+
         if (name != '*')
             query.name = { $regex: new RegExp(name, 'i') };
-        
+
         const communityThreads = await Thread.find(query).skip((page - 1) * limit).limit(limit);
 
         if (!communityThreads)
@@ -172,12 +172,12 @@ exports.getThreads = async (communityName, name, page, limit) => {
 
 exports.getThread = async (communityName, threadNameId) => {
     try {
-        
+
         const communityId = await Community.findOne({ name: communityName }).select({ _id: 1});
-        
+
         if (!communityId)
             throw new NotFoundError('Community Not Found');
-        
+
         console.log(communityName, threadNameId)
         const communityThread = await Thread.findOne({ community: communityId, nameId: threadNameId });
 
@@ -204,10 +204,10 @@ const mapUsernamesToIds = async (usernames) => {
 
         if (users.length != usernames.length)
             return null;
-        
+
         return users;
 
     } catch (error) {
         throw new DatabaseError('Database error.');
-    }    
+    }
 };
