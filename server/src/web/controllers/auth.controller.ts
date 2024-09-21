@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
-import { ApiResponse } from '../../responses/ApiResponse';
+import { ApiResponse } from '../interfaces/ApiResponse';
 import { createUser, authenticateUser } from '../../core/services/auth.service';
-import  { CodeResponse } from '../../responses/CodeResponse.enum';
-import  { ErrorConstants } from '../../responses/ErrorsConstants.enum';
-import { logger } from 'express-winston';
-import { expressLogger } from '../../configs/winston.config';
+import  { CodeResponse } from '../../constants/CodeResponse.enum';
+import  { ErrorConstants } from '../../constants/ErrorsConstants.enum';
+import { IAuth_AccessToken } from '../interfaces/IAuthResponses.interface';
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -32,8 +31,10 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 
     if (!!errors) {
       res.status(errors.error.code).json(ApiResponse.error(errors.error.message, errors.errors));
-    } else {
-      res.status(CodeResponse.CREATED.code).json(ApiResponse.success(CodeResponse.CREATED.message, accessToken));
+    }
+    else if (!!accessToken) {
+      const accessTokenResponse: IAuth_AccessToken = accessToken;
+      res.status(CodeResponse.CREATED.code).json(ApiResponse.success(CodeResponse.CREATED.message, accessTokenResponse));
     }
     return;
 
@@ -65,8 +66,10 @@ export const signin = async (req: Request, res: Response) => {
 
     if (!!errors) {
       res.status(errors.error.code).json(ApiResponse.error(errors.error.message, errors.errors));
-    } else {
-      res.status(CodeResponse.OK.code).json(ApiResponse.success(CodeResponse.OK.message, accessToken));
+    }
+    else if (!!accessToken){
+      const accessTokenResponse: IAuth_AccessToken = accessToken;
+      res.status(CodeResponse.OK.code).json(ApiResponse.success(CodeResponse.OK.message, accessTokenResponse));
     }
     return;
 

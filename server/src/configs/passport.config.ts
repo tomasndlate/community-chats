@@ -1,5 +1,5 @@
 // @ts-ignore
-const passport = require('passport');
+export const passport = require('passport');
 // const LocalStrategy = require('passport-local');
 // @ts-ignore
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
@@ -76,4 +76,4 @@ passport.use(new JwtStrategy({
     }
 }));
 
-module.exports = passport;
+// module.exports = passport;

@@ -1,44 +1,42 @@
-// const express = require('express');
 import express from "express";
-// const http = require('http');
-import http from "http";
-// const cors = require('cors');
 import cors from "cors";
-
-// require('dotenv').config();
 import dotenv from "dotenv";
-dotenv.config()
-
+import { createServer } from "http";
 import { connectMongoDB } from './configs/mongodb.config';
-// const passportConfig = require('./configs/passportConfig');
 import { logger, expressLogger } from './configs/winston.config';
+import { socketServer } from './sockets/socket'
+import { authRouter } from './web/routes/auth.routes';
+import { communitiesRouter } from './web/routes/communities.routes';
+// const passportConfig = require('./configs/passportConfig');
 // const { initOpenAPI } = require('./configs/openapi.config');
 
+// Allow environment variables
+dotenv.config()
+
 // Instance of express application
-const expressApp = express();
+const restfulApi = express();
 
 // Configuration
-expressApp.use(cors());
-expressApp.use(express.json());
-expressApp.use(expressLogger);
+restfulApi.use(cors());
+restfulApi.use(express.json());
+restfulApi.use(expressLogger);
 connectMongoDB();
 // passportConfig.initialize();
 
 // Importing REST Routes and documentation
-expressApp.use('/auth', require('./web/routes/auth.routes'));
+restfulApi.use('/auth', authRouter);
 // expressApp.use('/users', require('./web/routes/users.routes'));
-// expressApp.use('/communities', require('./web/routes/communities.routes'));
+restfulApi.use('/communities', communitiesRouter);
 
-// Instance of server using express application
-const restServer = http.createServer(expressApp);
-// const socket = require('./sockets/socket');
+// instance of restfull api
+const server = createServer(restfulApi);
+// socket within the server
+socketServer(server);
 
 const port = process.env.API_PORT;
-restServer.listen(port, () => {
+
+server.listen(port, () => {
     // Open API Definition
     // initOpenAPI(expressApp, process.env.API_PORT);
-    // Start the server
-    // socket(restServer);
-
     logger.info(`Express Server running on http://localhost:${port}`);
 })

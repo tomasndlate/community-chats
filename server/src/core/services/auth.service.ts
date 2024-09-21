@@ -1,9 +1,11 @@
-// const User = require('../models/User');
-import { User } from "../models/User.db";
+import { IUserDocument, User } from "../models/User.db";
 import { encryptPassword, comparePassword } from '../utils/password.utils';
-import { ErrorConstants, ErrorConstantsType } from '../../responses/ErrorsConstants.enum';
-import { CodeResponse, CodeResponseType } from '../../responses/CodeResponse.enum';
-const authTokenUtils = require('../utils/auth-token.utils');
+import { ErrorConstants, ErrorConstantsType } from '../../constants/ErrorsConstants.enum';
+import { CodeResponse, CodeResponseType } from '../../constants/CodeResponse.enum';
+import { validateAuthToken } from "../utils/auth-token.utils";
+
+// const authTokenUtils = require('../utils/auth-token.utils');
+import { generateAuthToken } from '../utils/auth-token.utils';
 
 export const createUser = async (name: string, email: string, password: string):
   Promise<[{ accessToken: string } | null, {error: CodeResponseType, errors: ErrorConstantsType[]} | null]> => {
@@ -11,7 +13,6 @@ export const createUser = async (name: string, email: string, password: string):
     const existentEmail = await User.findOne({email: email});
     let errors: ErrorConstantsType[] = [];
 
-    console.log(existentEmail)
     if (!!existentEmail)
         errors.push(ErrorConstants.DUPLICATED.EMAIL);
 
@@ -28,7 +29,7 @@ export const createUser = async (name: string, email: string, password: string):
 
 
     const createdUser = await user.save();
-    const accessToken = await generateAuthToken(createdUser._id.toString());
+    const accessToken = await getAuthToken(createdUser._id.toString());
 
     return [{ accessToken: accessToken }, null];
 
@@ -54,7 +55,7 @@ export const authenticateUser = async (email: string, password: string):
     if(!isValidPassword)
       return [null, {error: CodeResponse.UNAUTHORIZED, errors: [ErrorConstants.UNAUTHORIZED.SIGNIN]}];
 
-    const accessToken = authTokenUtils.generateAuthToken(user._id);
+    const accessToken = generateAuthToken(user._id);
 
     return [{ accessToken: accessToken }, null];
 
@@ -63,6 +64,22 @@ export const authenticateUser = async (email: string, password: string):
   }
 }
 
-const generateAuthToken = (userId: string) => {
-  return authTokenUtils.generateAuthToken(userId);
+export const isTokenAuthenticated = async (accessToken: string): Promise< IUserDocument | null> => {
+  try {
+
+    const userId = validateAuthToken(accessToken);
+
+    console.log(`TOKEN DECODED ${userId.toString()}`)
+    const user: IUserDocument | null = await User.findById(userId as string);
+    console.log(`USER ${user}`)
+
+    return user;
+
+  } catch (error) {
+    return null;
+  }
+}
+
+const getAuthToken = (userId: string) => {
+  return generateAuthToken(userId);
 }

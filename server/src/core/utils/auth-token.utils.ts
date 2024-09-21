@@ -20,8 +20,9 @@ export const validateAuthToken = (token: string) => {
       throw new Error('API_JWT_SECRET environment variable is not defined');
 
     const tokenDecoded = jwt.verify(token, process.env.API_JWT_SECRET);
+    const userId = (tokenDecoded as { userId: string }).userId;
 
-    return tokenDecoded;
+    return userId;
 
   } catch (error) {
     throw error;

@@ -1,18 +1,19 @@
 // const express = require('express');
 import express from "express";
-const router = express.Router();
 import { signin, signup } from '../controllers/auth.controller';
+
+export const authRouter = express.Router();
 // import
 // const googleMiddleware = require('../middleware/googleMidleware');
 // const passport = require('../../configs/passportConfig');
 
-router.post('/signup', signup);
+authRouter.post('/signup', signup);
 
 // router.post('/signup', )
 
-router.post('/signin', signin);
+authRouter.post('/signin', signin);
 
 // router.get('/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
 // router.get('/google/callback', googleMiddleware, authController.login);
 
-module.exports = router;
+// export router;
