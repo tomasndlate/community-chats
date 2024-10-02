@@ -1,9 +1,0 @@
-{
-  "nav-items": [
-    { "label": "Home", "route": "/home" },
-    {"communities": ""}
-  ],
-  "footer": {
-
-  }
-}

@@ -1,1 +1,16 @@
-<p>sign-in works!</p>
+<p>Sign in</p>
+
+<label for="email">Email</label>
+<input [(ngModel)]="email" type="text" id="email">
+<p *ngIf="errors.not_found_email">Error: {{errors.not_found_email}}</p>
+<br>
+
+<label for="password">Password</label>
+<input [(ngModel)]="password" type="text" id="password">
+
+<br>
+<br>
+<p *ngIf="errors.invalid_credentials">Error: {{errors.invalid_credentials}}</p>
+<br>
+
+<button (click)="signIn()">Sign in</button>

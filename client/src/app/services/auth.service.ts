@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, filter, map, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, filter, map, Observable, tap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { AuthToken } from '../models/auth-token.model';
 import { ApiErrorResponse, ApiSuccessResponse } from '../models/responses.model';
 import { NavigationEnd, Router } from '@angular/router';
+import { IRequestBody_SignIn } from '../interfaces/RequestBody';
+import { ApiResponse } from '../interfaces/ResponseBody';
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +14,10 @@ import { NavigationEnd, Router } from '@angular/router';
 export class AuthService {
 
   private apiUrl = environment.apiUrl;
+
   private isUserLoggedInSubject = new BehaviorSubject<boolean>(false);
   isUserLoggedIn$: Observable<boolean> = this.isUserLoggedInSubject.asObservable();
+
   private urls = {
     current: '',
     previous: ''
@@ -40,8 +44,8 @@ export class AuthService {
     return this.http.post<ApiSuccessResponse<AuthToken>>(`${this.apiUrl}/auth/signup`, requestBody, httpOptions).pipe(
       map((response) => {
         if (!!response.data.accessToken) {
-          this.setToken(response.data.accessToken);
-          this.setIsUserLoggedIn(true);
+          // this.setToken(response.data.accessToken);
+          // this.setIsUserLoggedIn(true);
           return true;
         }
         return false;
@@ -52,26 +56,41 @@ export class AuthService {
     )
   }
 
+  signin(email: string, password: string): Observable<ApiResponse<AuthToken>> {
+    const requestBody_signIn: IRequestBody_SignIn = {
+      email: email,
+      password: password
+    };
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      }),
+    };
+    return this.http.post<ApiResponse<AuthToken>>(`${this.apiUrl}/auth/signin`, requestBody_signIn, httpOptions).pipe(
+      tap(response => {
+        if(response.data?.accessToken) {
+          this.setUserSignedIn(response.data.accessToken);
+        }
+      })
+    )
+  }
+
   signOut() {
-    this.removeToken();
-    this.setIsUserLoggedIn(false);
-    // this.router.navigate(['/signin'])
+    this.setUserSignedOut();
   }
 
-  private getToken() {
-    return localStorage.getItem('accessToken');
+  private initIsUserSignedIn() {
+
   }
 
-  private setToken(token: string) {
+  private setUserSignedIn(token: string) {
     localStorage.setItem('accessToken', token);
+    this.isUserLoggedInSubject.next(true);
   }
 
-  private removeToken(){
+  private setUserSignedOut(){
     localStorage.removeItem('accessToken');
-  }
-
-  private setIsUserLoggedIn(newStatus: boolean): void {
-    this.isUserLoggedInSubject.next(newStatus);
+    this.isUserLoggedInSubject.next(false);
   }
 
   private trackUrl(): void {
